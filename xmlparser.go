@@ -90,6 +90,8 @@ func (x *XMLParser) parse() {
 	var err error
 	var b byte
 	var iscomment bool
+	var useTag bool
+	loopAll := len(x.loopElements) == 0
 
 	err = x.skipDeclerations()
 
@@ -139,7 +141,14 @@ func (x *XMLParser) parse() {
 				return
 			}
 
-			if _, found := x.loopElements[element.Name]; found {
+			useTag = false
+			if loopAll {
+				useTag = true
+			} else {
+				_, useTag = x.loopElements[element.Name]
+			}
+			
+			if useTag {
 				if tagClosed {
 					x.resultChannel <- element
 					continue
